@@ -1,0 +1,393 @@
+%Q1
+%LA
+[HouseID,Price,CountyID,YearBuilt,SquareFootage,Bathrooms,Bedrooms,TotalRooms,Stories,VCR,PCR,YearSale]=textread("la_data.txt",'%n%n%n%n%n%n%n%n%n%n%n%n');
+la_data=[HouseID,Price,CountyID,YearBuilt,SquareFootage,Bathrooms,Bedrooms,TotalRooms,Stories,VCR,PCR,YearSale];
+Varnames=["HouseID","Price","CountyID","YearBuilt","SquareFootage","Bathrooms","Bedrooms","TotalRooms","Stories","VCR","PCR","YearSale"];
+    meanLA=mean(la_data(CountyID==37,:),1); %get mean,variance
+    varLA=var(la_data(CountyID==37,:),1);
+    LA=["LA",Varnames;"mean",meanLA;"var",varLA];
+    meanO=mean(la_data(CountyID==59,:),1);
+    varO=var(la_data(CountyID==59,:),1);
+    O=["O",Varnames;"mean",meanO;"var",varO];
+    meanR=mean(la_data(CountyID==65,:),1);
+    varR=var(la_data(CountyID==65,:),1);
+    R=["R",Varnames;"mean",meanR;"var",varR];
+    meanSB=mean(la_data(CountyID==71,:),1);
+    varSB=var(la_data(CountyID==71,:),1);
+    SB=["SB",Varnames;"mean",meanSB;"var",varSB];
+    meanV=mean(la_data(CountyID==111,:),1);
+    varV=var(la_data(CountyID==111,:),1);
+    V=["V",Varnames;"mean",meanV;"var",varV];
+    %Q1 sf
+[HouseIDsf,Pricesf,CountyIDsf,YearBuiltsf,SquareFootagesf,Bathroomssf,Bedroomssf,TotalRoomssf,Storiessf,VCRsf,PCRsf,YearSalesf]=textread("sf_data.txt",'%n%n%n%n%n%n%n%n%n%n%n%n');
+sf_data=[HouseIDsf,Pricesf,CountyIDsf,YearBuiltsf,SquareFootagesf,Bathroomssf,Bedroomssf,TotalRoomssf,Storiessf,VCRsf,PCRsf,YearSalesf];
+Varnames=["HouseIDsf","Pricesf","CountyIDsf","YearBuiltsf","SquareFootagesf","Bathroomssf","Bedroomssf","TotalRoomssf","Storiessf","VCRsf","PCRsf","YearSalesf"];
+    meanAL=mean(sf_data(CountyIDsf==1,:),1); %get mean,variance
+    varAL=var(sf_data(CountyIDsf==1,:),1);
+    AL=["AL",Varnames;"mean",meanAL;"var",varAL];
+    meanCC=mean(sf_data(CountyIDsf==13,:),1);
+    varCC=var(sf_data(CountyIDsf==13,:),1);
+    CC=["CC",Varnames;"mean",meanCC;"var",varCC];
+    meanSF=mean(sf_data(CountyIDsf==75,:),1);
+    varSF=var(sf_data(CountyIDsf==75,:),1);
+    SF=["SF",Varnames;"mean",meanSF;"var",varSF];
+    meanSC=mean(sf_data(CountyIDsf==85,:),1);
+    varSC=var(sf_data(CountyIDsf==85,:),1);
+    SC=["SC",Varnames;"mean",meanSC;"var",varSC];
+    meanSM=mean(sf_data(CountyIDsf==81,:),1);
+    varSM=var(sf_data(CountyIDsf==81,:),1);
+    SM=["SM",Varnames;"mean",meanSM;"var",varSM];
+    sf_data(CountyIDsf==41,:)=[];
+    sf_data(CountyIDsf==55,:)=[];
+    sf_data(CountyIDsf==95,:)=[];
+    sf_data(CountyIDsf==97,:)=[];    
+% question 2
+PCR2=PCR.^2;
+TotalRooms2=TotalRooms.^2;
+VCR2=VCR.*VCR;
+SquareFootage2=SquareFootage.^2;
+YearBuilt2=YearBuilt.*YearBuilt;
+YS=categorical(YearSale); %create dummy variables
+D1 = dummyvar(YS);
+D1(:,7)=[];
+CID=categorical(CountyID);
+D2 = dummyvar(CID);
+D2(:,1)=[];
+D2(:,4)=[];
+D1993=D1(:,1);
+D1994=D1(:,2);
+D1995=D1(:,3);
+D1996=D1(:,4);
+D1997=D1(:,5);
+D1998=D1(:,6);
+D2000=D1(:,7);
+D2001=D1(:,8);
+D2002=D1(:,9);
+D2003=D1(:,10);
+D2004=D1(:,11);
+D2005=D1(:,12);
+D2006=D1(:,13);
+D2007=D1(:,14);
+D2008=D1(:,15);
+D59=D2(:,1);
+D65=D2(:,2);
+D71=D2(:,3);
+X=[ones(size(VCR)),YearBuilt,SquareFootage,Bathrooms,Bedrooms,TotalRooms,Stories,VCR,PCR,PCR2,VCR2,TotalRooms2,SquareFootage2,D1,D2,YearBuilt2];
+Y=Price;
+betaQ2=inv(X'*X)*X'*Y; % get beta
+sample=[X,Y];
+B=bootstrp(500,@(sample)inv(sample(:,1:32)'*sample(:,1:32))*sample(:,1:32)'*sample(:,33),sample);
+Yfit = X*(inv(X'*X)*X'*Y);
+resid = Y - Yfit;
+se = std(bootstrp(500, @(bootr) inv(X'*X)*X'*(Yfit+bootr), resid));
+% question 2 sf
+PCR2sf=PCRsf.^2;
+TotalRooms2sf=TotalRoomssf.^2;
+VCR2sf=VCRsf.*VCRsf;
+SquareFootage2sf=SquareFootagesf.^2;
+YearBuilt2sf=YearBuiltsf.*YearBuiltsf;
+YSsf=categorical(YearSalesf); %create dummy variables
+D1sf = dummyvar(YSsf);
+D1sf(:,7)=[];
+CIDsf=categorical(CountyIDsf);
+D2sf = dummyvar(CIDsf);
+D2sf(:,1)=[];
+D1993sf=D1sf(:,1);
+D1994sf=D1sf(:,2);
+D1995sf=D1sf(:,3);
+D1996sf=D1sf(:,4);
+D1997sf=D1sf(:,5);
+D1998sf=D1sf(:,6);
+D2000sf=D1sf(:,7);
+D2001sf=D1sf(:,8);
+D2002sf=D1sf(:,9);
+D2003sf=D1sf(:,10);
+D2004sf=D1sf(:,11);
+D2005sf=D1sf(:,12);
+D2006sf=D1sf(:,13);
+D2007sf=D1sf(:,14);
+D2008sf=D1sf(:,15);
+D13sf=D2sf(:,1);
+D75sf=D2sf(:,2);
+D81sf=D2sf(:,3);
+D85sf=D2sf(:,4);
+Xsf=[ones(size(VCRsf)),YearBuiltsf,SquareFootagesf,Bathroomssf,Bedroomssf,TotalRoomssf,Storiessf,VCRsf,PCRsf,PCR2sf,VCR2sf,TotalRooms2sf,SquareFootage2sf,D1sf,D2sf,YearBuilt2sf];
+Ysf=Pricesf;
+betaQ2sf=inv(Xsf'*Xsf)*Xsf'*Ysf; % get beta
+samplesf=[Xsf,Ysf];
+Bsf=bootstrp(500,@(samplesf)inv(samplesf(:,1:33)'*samplesf(:,1:33))*samplesf(:,1:33)'*samplesf(:,34),samplesf);
+Yfitsf = Xsf*(inv(Xsf'*Xsf)*Xsf'*Ysf);
+residsf = Ysf - Yfitsf;
+sesf = std(bootstrp(500, @(bootr) inv(Xsf'*Xsf)*Xsf'*(Yfitsf+bootr), residsf));
+%question 3
+[BuyerIDsl,PriceBsl,VCRBsl,PCRBsl,Racesl,Incomesl,LAIndicator]=textread("buyer_data_sf_la.txt",'%n%n%n%n%n%n%n');
+    CV=[];
+    CP=[];
+    sv=[];
+    sp=[];
+   XQ3= [ones(size(PriceBsl)),VCRBsl,PCRBsl,Racesl,Incomesl,LAIndicator];
+    GV=[];
+    GP=[];
+for a=[1:500]
+        %f=@(YearBuilt,SquareFootage,Bathrooms,Bedrooms,TotalRooms,Stories,VCR,PCR,PCR.*PCR,VCR.*VCR,TotalRooms2,SquareFootage2,D1993,D1994,D1995,D1996,D1997,D1998,D2000,D2001,D2002,D2003,D59,D65,D71,YearBuilt2) B(a,1)+B(a,2)*YearBuilt+B(a,3)*SquareFootage+B(a,4)*Bathrooms+B(a,5)*Bedrooms+B(a,6)*TotalRooms+B(a,7)*Stories+B(a,8)*VCR+B(a,9)*PCR+B(a,10)*PCR.^2+B(a,11)*VCR.*VCR+B(a,12)*TotalRooms2+B(a,13)*SquareFootage2+B(a,14)*D1993+B(a,15)*D1994+B(a,16)*D1995+B(a,17)*D1996+B(a,18)*D1997+B(a,19)*D1998+B(a,20)*D2000+B(a,21)*D2001+B(a,22)*D2002+B(a,23)*D2003+B(a,24)*D2004+B(a,25)*D2005+B(a,26)*D2006+B(a,27)*D2007+B(a,28)*D2008+B(a,29)*D59+B(a,30)*D65+B(a,31)*D71+B(a,32)*YearBuilt2
+        PGV1=B(a,8)+2*B(a,11)*VCRBsl(LAIndicator==1); % price gradient function of VC
+        PGP1=B(a,9)+2*B(a,10)*VCRBsl(LAIndicator==1); % price gradient function of PC
+        PGV0=Bsf(a,8)+2*Bsf(a,11)*VCRBsl(LAIndicator==0); % price gradient function of VC
+        PGP0=Bsf(a,9)+2*Bsf(a,10)*VCRBsl(LAIndicator==0); 
+        GV=[GV,[PGV0;PGV1]]; %get price gradient value
+        GP=[GP,[PGP0;PGP1]];
+end     
+    PGVV=GV;
+    PGPV=GP;
+    ZV=[ones(size(VCRBsl)),VCRBsl,Racesl,Incomesl,LAIndicator];
+    ZP=[ones(size(VCRBsl)),PCRBsl,Racesl,Incomesl,LAIndicator];
+    for n=[1:500]
+        Q3slv=[ZV,PGVV(:,n)];
+        Q3slp=[ZP,PGPV(:,n)];
+    BV=bootstrp(1,@(Q3slv)inv(Q3slv(:,1:5)'*Q3slv(:,1:5))*Q3slv(:,1:5)'*Q3slv(:,6),Q3slv);
+    BP=bootstrp(1,@(Q3slp)inv(Q3slp(:,1:5)'*Q3slp(:,1:5))*Q3slp(:,1:5)'*Q3slp(:,6),Q3slp);
+    CV=[CV;BV];
+    CP=[CP;BP];
+    bv=inv(Q3slv(:,1:5)'*Q3slv(:,1:5))*Q3slv(:,1:5)'*Q3slv(:,6);
+    bp=inv(Q3slp(:,1:5)'*Q3slp(:,1:5))*Q3slp(:,1:5)'*Q3slp(:,6);
+    end
+    stdbv=std(CV);
+    stdbp=std(CP);
+PGVQ3=@(x) betaQ2(8)+2*betaQ2(11)*x; % price gradient function of VC
+PGPQ3=@(y) betaQ2(9)+2*betaQ2(10)*y; % price gradient function of PC
+GVQ3la=PGVQ3(VCRBsl(LAIndicator==1)); %get price gradient value
+GPQ3la=PGPQ3(PCRBsl(LAIndicator==1));
+PGVQ3sf=@(x) betaQ2sf(8)+2*betaQ2sf(11)*x; % price gradient function of VC
+PGPQ3sf=@(y) betaQ2sf(9)+2*betaQ2sf(10)*y; % price gradient function of PC
+GVQ3sf=PGVQ3sf(VCRBsl(LAIndicator==0)); %get price gradient value
+GPQ3sf=PGPQ3sf(PCRBsl(LAIndicator==0));
+GVQ3=[GVQ3sf;GVQ3la];
+GPQ3=[GPQ3sf;GPQ3la];
+ZVQ3=[ones(size(GVQ3)),VCRBsl,Racesl,Incomesl,LAIndicator];
+ZPQ3=[ones(size(GVQ3)),PCRBsl,Racesl,Incomesl,LAIndicator];
+Q3vc=fitlm(ZVQ3,GVQ3);
+Q3pc=fitlm(ZPQ3,GPQ3);
+%Q4
+[BuyerID,PriceB,VCRB,PCRB,Race,Income]=textread("buyer_data_la.txt",'%n%n%n%n%n%n');
+Ch1=[];
+for gama=[1:2000]
+  h=1;
+  beta0=[1.0e+05 *3.9009,-0.0020];
+  weights=(1/(h*std(VCR)))*(1/(2*pi))*exp(-(1/2)*((VCR-gama)/(h*std(VCR))).^2);
+  modelfun=@(beta,VCR) (beta(1)+beta(2)*VCR);
+  beta=nlinfit(VCR,Price,modelfun,beta0,"weights",weights);
+  Ch1=[Ch1;beta];
+end
+Gama=[1:2000];
+plot(Gama,Ch1(:,2));
+Ch3=[];
+for gama=[1:2000]
+  h=3;
+  beta0=[1.0e+05 *3.9009,-0.0020];
+  weights=(1/(h*std(VCR)))*(1/(2*pi))*exp(-(1/2)*((VCR-gama)/(h*std(VCR))).^2);
+  modelfun=@(beta,VCR) (beta(1)+beta(2)*VCR);
+  beta=nlinfit(VCR,Price,modelfun,beta0,"weights",weights);
+  Ch3=[Ch3;beta];
+end
+Gama=[1:2000];
+plot(Gama,Ch3(:,2));
+Ch10=[];
+for gama=[1:2000]
+  h=10;
+  beta0=[1.0e+05 *3.9009,-0.0020];
+  weights=(1/(h*std(VCR)))*(1/(2*pi))*exp(-(1/2)*((VCR-gama)/(h*std(VCR))).^2);
+  modelfun=@(beta,VCR) (beta(1)+beta(2)*VCR);
+  beta=nlinfit(VCR,Price,modelfun,beta0,"weights",weights);
+  Ch10=[Ch10;beta];
+end
+Gama=[1:2000];
+plot(Gama,Ch10(:,2));
+Ch1000=[];
+for gama=[1:2000]
+  h=1000;
+  beta0=[1.0e+05 *3.9009,-0.0020];
+  weights=(1/(h*std(VCR)))*(1/(2*pi))*exp(-(1/2)*((VCR-gama)/(h*std(VCR))).^2);
+  modelfun=@(beta,VCR) (beta(1)+beta(2)*VCR);
+  beta=nlinfit(VCR,Price,modelfun,beta0,"weights",weights);
+  Ch1000=[Ch1000;beta];
+end
+Gama=[1:2000];
+plot(Gama,Ch1(:,2),Gama,Ch3(:,2),Gama,Ch10(:,2),Gama,Ch1000(:,2));
+%Q5
+Rc=categorical(Race);
+Drace = dummyvar(Rc);
+Asian=Drace(:,1);
+Black=Drace(:,2);
+Hisp=Drace(:,3);
+Buyersla=[BuyerID,PriceB,VCRB,PCRB,Asian,Black,Hisp,Income];
+index=[1:55498];
+samplebuyers=Buyersla(randsample(index,2000),:);
+VCRBSample=samplebuyers(:,3);
+AsianSample=samplebuyers(:,5);
+BlackSample=samplebuyers(:,6);
+HispSample=samplebuyers(:,7);
+IncomeSample=samplebuyers(:,8);
+PG=Ch1(:,2);
+Buyerslax=[ones(size(IncomeSample)),IncomeSample,AsianSample,BlackSample,HispSample];
+BetaQ5=regress(PG,Buyerslax);
+Q5=fitlm(Buyerslax,PG);
+%Q6
+%first stage
+Rcsl=categorical(Racesl);
+Dracesl = dummyvar(Rcsl);
+Asiansl=Dracesl(:,1);
+Blacksl=Dracesl(:,2);
+Hispsl=Dracesl(:,3);
+XQ6=[ones(size(YearBuilt)),YearBuilt,SquareFootage,Bathrooms,Bedrooms,TotalRooms,Stories,VCR,VCR.^2,VCR.^3,VCR.^4,VCR.^5,VCR.^6,PCR,PCR2,TotalRooms2,SquareFootage2,D1,D2,YearBuilt2];
+YQ6=Price;
+SampleQ6=[XQ6,YQ6];
+BQ6=bootstrp(500,@(SampleQ6)inv(SampleQ6(:,1:36)'*SampleQ6(:,1:36))*SampleQ6(:,1:36)'*SampleQ6(:,37),SampleQ6);
+betaQ6=inv(XQ6'*XQ6)*XQ6'*YQ6;
+ YQ6fit = XQ6*betaQ6;
+ residQ6 = YQ6 - YQ6fit;
+seQ6 = std(bootstrp(500, @(bootr) inv(XQ6'*XQ6)*XQ6'*(YQ6fit+bootr), residQ6));
+XQ6sf=[ones(size(YearBuiltsf)),YearBuiltsf,SquareFootagesf,Bathroomssf,Bedroomssf,TotalRoomssf,Storiessf,VCRsf,VCRsf.^2,VCRsf.^3,VCRsf.^4,VCRsf.^5,VCRsf.^6,PCRsf,PCR2sf,TotalRooms2sf,SquareFootage2sf,D1sf,D2sf,YearBuilt2sf];
+YQ6sf=Pricesf;
+SampleQ6sf=[XQ6sf,YQ6sf];
+BQ6sf=bootstrp(500,@(SampleQ6sf)inv(SampleQ6sf(:,1:37)'*SampleQ6sf(:,1:37))*SampleQ6sf(:,1:37)'*SampleQ6sf(:,38),SampleQ6sf);
+betaQ6sf=inv(XQ6sf'*XQ6sf)*XQ6sf'*YQ6sf;
+ YQ6fitsf = XQ6sf*betaQ6sf;
+ residQ6sf = YQ6sf - YQ6fitsf;
+seQ6sf = std(bootstrp(500, @(bootr) inv(XQ6sf'*XQ6sf)*XQ6sf'*(YQ6fitsf+bootr), residQ6sf));
+global TPGQ61
+global TPG2Q61
+global Asiansl
+global Blacksl
+global Hispsl
+global Incomesl
+global VCRBsl
+global sigma0Q6 
+global a0Q6a
+global sigma0Q6a
+global a0Q6
+global k
+global alpha0
+BQ62=[];
+a0Q6=[];
+sigma0Q6=[];
+BuyerQ6=[ones(size(VCRBsl)),VCRBsl,Asiansl,Blacksl,Hispsl,Incomesl];
+ XQ6sl= [ones(size(PriceBsl)),VCRBsl,PCRBsl,Racesl,Incomesl,LAIndicator];
+ PGQ61=[];
+        PG2Q61=[];
+        %get mwtp
+    for w=[1:500]
+        PGQ611=BQ6(w,8)+2*BQ6(w,9)*VCRBsl(LAIndicator==1)+3*BQ6(w,10)*VCRBsl(LAIndicator==1).^2+4*BQ6(w,11)*VCRBsl(LAIndicator==1).^3+5*BQ6(w,12)*VCRBsl(LAIndicator==1).^4+6*BQ6(w,13)*VCRBsl(LAIndicator==1).^5;
+        PG2Q611=2*BQ6(w,9)+6*BQ6(w,10)*VCRBsl(LAIndicator==1)+12*BQ6(w,11)*VCRBsl(LAIndicator==1).^2+20*BQ6(w,12)*VCRBsl(LAIndicator==1).^3+30*BQ6(w,13)*VCRBsl(LAIndicator==1).^4;
+        PGQ610=BQ6sf(w,8)+2*BQ6sf(w,9)*VCRBsl(LAIndicator==0)+3*BQ6sf(w,10)*VCRBsl(LAIndicator==0).^2+4*BQ6sf(w,11)*VCRBsl(LAIndicator==0).^3+5*BQ6sf(w,12)*VCRBsl(LAIndicator==0).^4+6*BQ6sf(w,13)*VCRBsl(LAIndicator==0).^5;
+        PG2Q610=2*BQ6sf(w,9)+6*BQ6sf(w,10)*VCRBsl(LAIndicator==0)+12*BQ6sf(w,11)*VCRBsl(LAIndicator==0).^2+20*BQ6sf(w,12)*VCRBsl(LAIndicator==0).^3+30*BQ6sf(w,13)*VCRBsl(LAIndicator==0).^4;
+        PGQ61=[PGQ61,[PGQ610;PGQ611]];
+        PG2Q61=[PG2Q61,[PG2Q610;PG2Q611]];
+    end
+    TPGQ61=PGQ61;
+    TPG2Q61=PG2Q61;
+    for a=[1:500]
+        [bQ6,~,rQ6]=regress(TPGQ61(:,a),BuyerQ6);
+        a0Q6=[a0Q6,bQ6];
+        rrQ6=sqrt(sum(rQ6.^2)/659548);     
+        sigma0Q6=[sigma0Q6;rrQ6];
+    end
+a0Q6a=mean(a0Q6,2);
+sigma0Q6a=sqrt(mean(sigma0Q6.^2));
+alpha0=mean(a0Q6(2,:));
+for k=[1:500]
+global k
+options = optimset('MaxFunEvals',1000000,'MaxIter',50000);
+x0=a0Q6(2,k);
+alpha=fminsearch(@f,x0,options);
+XQ62=[ones(size(Incomesl)),Incomesl,Asiansl,Blacksl,Hispsl];
+mwtpq6=inv(XQ62'*XQ62)*XQ62'*(TPGQ61(:,k)-alpha*VCRBsl);
+v=TPGQ61(:,k)-alpha*VCRBsl-XQ62*mwtpq6;
+sigma=sqrt(sum(v.^2)/659548);
+BQ62=[BQ62,[mwtpq6;sigma;alpha]];
+end
+stdBQ62=std(BQ62);
+% point estimate
+%get mwtp
+GVQ6la=betaQ6(8)+2*betaQ6(9)*VCRBsl(LAIndicator==1)+3*betaQ6(10)*VCRBsl(LAIndicator==1).^2+4*betaQ6(11)*VCRBsl(LAIndicator==1).^3+5*betaQ6(12)*VCRBsl(LAIndicator==1).^4+6*betaQ6(13)*VCRBsl(LAIndicator==1).^5; %get price gradient value % price gradient function of VC
+GVQ6sf=betaQ6sf(8)+2*betaQ6sf(9)*VCRBsl(LAIndicator==0)+3*betaQ6sf(10)*VCRBsl(LAIndicator==0).^2+4*betaQ6sf(11)*VCRBsl(LAIndicator==0).^3+5*betaQ6sf(12)*VCRBsl(LAIndicator==0).^4+6*betaQ6sf(13)*VCRBsl(LAIndicator==0).^5; %get price gradient value
+GVQ6=[GVQ6sf;GVQ6la];
+GV2Q6la=2*betaQ6(9)+6*betaQ6(10)*VCRBsl(LAIndicator==1)+12*betaQ6(11)*VCRBsl(LAIndicator==1).^2+20*betaQ6(12)*VCRBsl(LAIndicator==1).^3+30*betaQ6(13)*VCRBsl(LAIndicator==1).^4; %get price gradient value % price gradient function of VC
+GV2Q6sf=2*betaQ6sf(9)+6*betaQ6sf(10)*VCRBsl(LAIndicator==0)+12*betaQ6sf(11)*VCRBsl(LAIndicator==0).^2+20*betaQ6sf(12)*VCRBsl(LAIndicator==0).^3+30*betaQ6sf(13)*VCRBsl(LAIndicator==0).^4;%get price gradient value
+TPG2Q612=[GV2Q6sf;GV2Q6la];
+[bQ62,~,rQ62]=regress(GVQ6,BuyerQ6);
+fitlm(BuyerQ6,GVQ6)
+ sigma0Q62=sqrt(sum(rQ62.^2)/659548);     
+ a0Q6a2=bQ62;
+ TPGQ612=GVQ6;
+ global TPGQ612
+global TPG2Q612
+global Asiansl
+global Blacksl
+global Hispsl
+global Incomesl
+global VCRBsl
+global sigma
+global a
+global LAIndicator
+options = optimset('MaxFunEvals',1000000,'MaxIter',50000,'PlotFcns',@optimplotfval);
+x02=0;
+a(1)=a0Q6a2(1);
+a(2)=a0Q6a2(6);
+a(3)=a0Q6a2(3);
+a(4)=a0Q6a2(4);
+a(5)=a0Q6a2(5);
+sigma=sigma0Q62
+[alpha2,L2]=fminsearch(@f2,x02,options);
+XQ62=[ones(size(Incomesl)),Incomesl,Asiansl,Blacksl,Hispsl];
+mwtpq62=inv(XQ62'*XQ62)*XQ62'*(GVQ6-alpha2*VCRBsl);
+v2=GVQ6-alpha2*VCRBsl-XQ62*mwtpq62;
+sigma2=sqrt(sum(v2.^2)/659548);
+%%%%%%%%%%%%%%%%%%%%%% function
+function L2=f2(alpha)
+global TPGQ612
+global TPG2Q612
+global Asiansl
+global Blacksl
+global Hispsl
+global Incomesl
+global VCRBsl
+global sigma
+global a
+L2=0;
+for d=[1:659548]
+    v(d)=TPGQ612(d)-(a(1)+alpha*VCRBsl(d)+a(2)*Incomesl(d)+a(3)*Asiansl(d)+a(4)*Blacksl(d)+a(5)*Hispsl(d));
+    l(d)=log(normpdf(v(d),0,sigma))+log(abs(TPG2Q612(d)-alpha));
+end
+A=find(l==-inf)
+l(A)=[];
+L2=-sum(l);
+end
+%%%%%%%%%%%%%%%%%
+function L=f(alpha)
+global TPGQ61
+global TPG2Q61
+global Asiansl
+global Blacksl
+global Hispsl
+global Incomesl
+global VCRBsl
+global PG2Q6
+global sigma0Q6 
+global a0Q6a
+global sigma0Q6a
+global a0Q6
+global k
+global alpha0
+a(1)=a0Q6(1,k);
+a(2)=a0Q6(6,k);
+a(3)=a0Q6(3,k);
+a(4)=a0Q6(4,k);
+a(5)=a0Q6(5,k);
+sigma=sigma0Q6(k);
+for d=[1:659548]
+l(d)= log((1/(sigma*sqrt(2*pi)))*exp(-(1/(2*sigma^2))*((TPGQ61(d)-(a(1)+alpha*VCRBsl(d)+a(2)*Incomesl(d)+a(3)*Asiansl(d)+a(4)*Blacksl(d)+a(5)*Hispsl(d))).^2)).*abs(TPG2Q61(d)-alpha));
+end
+A=find(l==-inf)
+l(A)=[];
+L=-sum(l);
+end
